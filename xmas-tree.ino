@@ -1,4 +1,9 @@
 /*
+ * Christmas Tree updated to use 6 rings - 93 pixels
+ * Timothy Foreman 2018
+ * https://github.com/twforeman/xmas-tree
+ *
+ * Forked from:
  * Christmas tree by designer2k2.at
  * Stephan Martin 2016
  * http://www.designer2k2.at
@@ -16,12 +21,14 @@
  */
 
 
-#include <Adafruit_NeoPixel.h>    //needed for the WS2812
-#include <avr/pgmspace.h>		      //needed for PROGMEM
+#include <Adafruit_NeoPixel.h>  //needed for the WS2812
+#include <avr/pgmspace.h>       //needed for PROGMEM
 
-#define PIN 1					            //Pin 1 is DATA In on the bottom Ring
-#define BRIGHTNESS 40 			      // brightness reduced (about 180mA max, 100mA average)
-
+#define PIN 1		  //Pin 1 is DATA In on the bottom Ring
+#define BRIGHTNESS 40 	  // brightness reduced (about 180mA max, 100mA average)
+#define NUMPIXELS 93      // how many total pixels are there
+#define WAIT_SCENE 1000   // wait time between scene changes
+#define WAIT_LED 50       // wait time between led changes
 
 //Lookups for the X-M-A-S Letters viewed from above:
  const unsigned int charX[] PROGMEM = 
@@ -44,9 +51,18 @@
  //Lookup for the Candle light
  const unsigned int candles[] PROGMEM = 
  { 
-  15,10,48,45,36,19,59,29,5,43,41,39,24,3,61
+  93,92,90,87,84,79,75,72,69,65,61,59,54,48,45,43,41,39,36,33,29,24,19,15,10,5,3
  };
 
+
+int ringlen[] = {32, 24, 16, 12, 8, 1};
+// ring 1 is on the bottom
+// ring 1 = 0-31
+// ring 2 = 32-55
+// ring 3 = 56-71
+// ring 4 = 72-83
+// ring 5 = 84-91
+// ring 6 = 92
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -55,7 +71,8 @@
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(61, PIN, NEO_GRB + NEO_KHZ800);
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
@@ -69,8 +86,8 @@ void setup() {
   strip.show(); // Initialize all pixels to 'off'
   
   //XMAS Letters:
-  xmas();
-  delay(2000);
+  //xmas();
+  //delay(2000);
   
 }
 
@@ -78,39 +95,38 @@ void loop() {
   
   //Tree light:
   tree();
-  delay(1000);
+  delay(WAIT_SCENE);
 
   //Color crazy:
   colorcrazy();
   //delay(1000);
 
   warpdrive();
-  comet();
+  warpdrive();
+  //comet();
   
 
-  /*
   // Some example procedures showing how to display to the pixels:
-  colorWipe(strip.Color(255, 0, 0), 50); // Red
-  colorWipe(strip.Color(0, 255, 0), 50); // Green
-  colorWipe(strip.Color(0, 0, 255), 50); // Blue
+  //colorWipe(strip.Color(255, 0, 0), WAIT_LED); // Red
+  //colorWipe(strip.Color(0, 255, 0), WAIT_LED); // Green
+  //colorWipe(strip.Color(0, 0, 255), WAIT_LED); // Blue
   // Send a theater pixel chase in...
-  theaterChase(strip.Color(127, 127, 127), 50); // White
-  theaterChase(strip.Color(127,   0,   0), 50); // Red
-  theaterChase(strip.Color(  0,   0, 127), 50); // Blue
+  theaterChase(strip.Color(127, 127, 127), WAIT_LED); // White
+  theaterChase(strip.Color(127,   0,   0), WAIT_LED); // Red
+  theaterChase(strip.Color(  0,   0, 127), WAIT_LED); // Blue
 
   rainbow(20);
   rainbowCycle(20);
   theaterChaseRainbow(50);
-*/
+
 }
 
 //Sub-----------------------------------------------------------------------
 
 //Comet
 void comet(){
-  for(uint16_t i=strip.numPixels(); i>0; i--) {
+  for(uint16_t i=strip.numPixels(); i>=0; i--) {
      strip.setPixelColor(i,strip.Color(0, 0, 255));
-     fadethemall(10);
      fadethemall(10);
   }
 }
@@ -119,7 +135,7 @@ void comet(){
 void warpdrive(){
 
   //Top Led
-  strip.setPixelColor(60,strip.Color(255, 255, 255));
+  strip.setPixelColor(92,strip.Color(255, 255, 255));
   strip.show();
   //fade a bit
   for (int i = 0; i < 20; i++)
@@ -127,7 +143,7 @@ void warpdrive(){
     fadethemall(20);
   } 
   //8 Ring
-  for (int i = 52; i < 60; i++)
+  for (int i = 84; i < 92; i++)
   {
     strip.setPixelColor(i,strip.Color(255, 255, 255));
   }
@@ -138,7 +154,7 @@ void warpdrive(){
     fadethemall(20);
   } 
   //12 Ring
-  for (int i = 40; i < 52; i++)
+  for (int i = 72; i < 84; i++)
   {
     strip.setPixelColor(i,strip.Color(255, 255, 255));
   }
@@ -149,7 +165,7 @@ void warpdrive(){
     fadethemall(20);
   } 
   //16 Ring
-  for (int i = 24; i < 40; i++)
+  for (int i = 56; i < 72; i++)
   {
     strip.setPixelColor(i,strip.Color(255, 255, 255));
   }
@@ -160,7 +176,18 @@ void warpdrive(){
     fadethemall(20);
   }
   //24 Ring
-  for (int i = 0; i < 24; i++)
+  for (int i = 32; i < 56; i++)
+  {
+    strip.setPixelColor(i,strip.Color(255, 255, 255));
+  }
+  strip.show();
+  //fade a bit
+  for (int i = 0; i < 20; i++)
+  {
+    fadethemall(20);
+  }
+  //32 Ring
+  for (int i = 0; i < 32; i++)
   {
     strip.setPixelColor(i,strip.Color(255, 255, 255));
   }
@@ -218,20 +245,23 @@ void fadethemall(uint8_t wait){
 
 //This drives the WS2812 in a crazy pattern, fun!
 void colorcrazy(){ 
-  colorWipe(strip.Color(255, 0, 0), 25); // Red
-  colorWipe(strip.Color(0, 255, 0), 25); // Green
-  colorWipe(strip.Color(0, 0, 255), 25); // Blue  
-  theaterChaseRainbow(5);
+  colorWipe(strip.Color(255, 0, 0), 25);   // Red
+  colorWipe(strip.Color(0, 255, 0), 25);   // Green
+  colorWipe(strip.Color(0, 0, 255), 25);   // Blue  
+  colorWipe(strip.Color(255, 255, 0), 25); // Yellow
+  colorWipe(strip.Color(255, 0, 255), 25); // Magenta
+  colorWipe(strip.Color(0, 255, 255), 25); // Cyan
+  //theaterChaseRainbow(50);
 }
 
-//This lights up the tree in green, then add the white "candles"
+// This lights up the tree in green, then add the white "candles"
 void tree(){
 
-  colorWipe(strip.Color(0, 50, 0), 50); // Green
+  colorWipe(strip.Color(0, 50, 0), WAIT_LED); // Green
 
-  //light "candles"
-  //Show the S:
-  for (int i = 0; i < 16; i++)
+  // light "candles"
+  // the loop counter is the length of the candles array
+  for (int i = 0; i < 27; i++)
   {
     strip.setPixelColor(pgm_read_word(&candles[i])-1,strip.Color(255, 255, 255));
     strip.show();
@@ -240,7 +270,7 @@ void tree(){
 
 }
 
-//This shows the X-M-A-S when viewed from above
+//This shows the X-M-A-S when viewed from above - TODO - rework for 93 pixels
 void xmas(){
 
   colorWipe(strip.Color(0, 0, 0), 0); // blank
@@ -303,7 +333,7 @@ void rainbow(uint8_t wait) {
   uint16_t i, j;
 
   for(j=0; j<256; j++) {
-    for(i=0; i<strip.numPixels(); i++) {
+    for(i=0; i<=strip.numPixels(); i++) {
       strip.setPixelColor(i, Wheel((i+j) & 255));
     }
     strip.show();
@@ -316,7 +346,7 @@ void rainbowCycle(uint8_t wait) {
   uint16_t i, j;
 
   for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< strip.numPixels(); i++) {
+    for(i=0; i<= strip.numPixels(); i++) {
       strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
     }
     strip.show();
@@ -328,14 +358,14 @@ void rainbowCycle(uint8_t wait) {
 void theaterChase(uint32_t c, uint8_t wait) {
   for (int j=0; j<10; j++) {  //do 10 cycles of chasing
     for (int q=0; q < 3; q++) {
-      for (int i=0; i < strip.numPixels(); i=i+3) {
+      for (int i=0; i <= strip.numPixels(); i=i+3) {
         strip.setPixelColor(i+q, c);    //turn every third pixel on
       }
       strip.show();
      
       delay(wait);
      
-      for (int i=0; i < strip.numPixels(); i=i+3) {
+      for (int i=0; i <= strip.numPixels(); i=i+3) {
         strip.setPixelColor(i+q, 0);        //turn every third pixel off
       }
     }
@@ -346,14 +376,14 @@ void theaterChase(uint32_t c, uint8_t wait) {
 void theaterChaseRainbow(uint8_t wait) {
   for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
     for (int q=0; q < 3; q++) {
-        for (int i=0; i < strip.numPixels(); i=i+3) {
+        for (int i=0; i <= strip.numPixels(); i=i+3) {
           strip.setPixelColor(i+q, Wheel( (i+j) % 255));    //turn every third pixel on
         }
         strip.show();
        
         delay(wait);
        
-        for (int i=0; i < strip.numPixels(); i=i+3) {
+        for (int i=0; i <= strip.numPixels(); i=i+3) {
           strip.setPixelColor(i+q, 0);        //turn every third pixel off
         }
     }
