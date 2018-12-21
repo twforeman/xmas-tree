@@ -51,7 +51,7 @@
  //Lookup for the Candle light
  const unsigned int candles[] PROGMEM = 
  { 
-  93,92,90,87,84,79,75,72,69,65,61,59,54,48,45,43,41,39,36,33,29,24,19,15,10,5,3
+  93,91,89,85,87,79,76,73,82,69,65,67,62,59,57,54,56,54,50,48,45,43,41,38,35,33,31,28,24,20,17,14,10,6,3
  };
 
 
@@ -261,11 +261,11 @@ void tree(){
 
   // light "candles"
   // the loop counter is the length of the candles array
-  for (int i = 0; i < 27; i++)
+  for (int i = 0; i < 35; i++)
   {
     strip.setPixelColor(pgm_read_word(&candles[i])-1,strip.Color(255, 255, 255));
     strip.show();
-    delay(50);
+    delay(WAIT_LED);
   }
 
 }
